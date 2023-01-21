@@ -1,1 +1,1 @@
-from .user import UserRead, UserCreate, UserUpdate
+from .user import UserRead, UserCreate, UserUpdate, UserForFlat
