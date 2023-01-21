@@ -18,11 +18,18 @@ class Renting(Base):
     count_guest = Column(SmallInteger)
 
     user_id = Column(GUID, ForeignKey('user.id'))
+
+    # TODO relationship в конце - после полей, но до функций
     user = relationship('User')
     flat_id = Column(UUID(as_uuid=True), ForeignKey('flat.id'))
     flat = relationship('Flat')
+
+    # TODO is_approved не совсем правильно: по бизнес-логике объект
+    #  может быть одобрен, отклонен или ожидать решения.
+    #  одобрен - True, отклонен - False, ожидает - None
     is_approved = Column(Boolean, default=False, server_default=expression.false())
 
     @property
     def date_range(cls):
+        # TODO убери скобки - и общая рекомендация включать форматтеры и проверку стиля кода
         return (cls.lease_range.upper, cls.lease_range.lower)

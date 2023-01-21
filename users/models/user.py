@@ -15,6 +15,13 @@ class User(Base, SQLAlchemyBaseUserTableUUID):
     username = Column(String)
 
 
+# TODO управлению сессиями БД нужен отдельный файл - и не в каком-то
+#  конкретном приложении, а мб даже в корне. Например, создать папку core для общих вещей
+#  /users
+#  /flats
+#  /core
+
+
 async_session_maker = sessionmaker(engine_async, class_=AsyncSession, expire_on_commit=False)
 
 

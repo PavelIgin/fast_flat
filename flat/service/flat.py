@@ -15,6 +15,7 @@ from db import engine_async
 async def get_flat_list():
     async_session = sessionmaker(engine_async, expire_on_commit=False, class_=AsyncSession)
     async with async_session() as sessions:
+        # TODo проверку is_active надо
         result = await sessions.execute(select(Flat).options(selectinload(Flat.user)))
         return result.scalars().all()
 
@@ -31,6 +32,7 @@ async def update_flat(pk: UUID, item: FlatUpdate, user):
     async with async_session() as sessions:
         query = update(Flat).where(Flat.id == pk).values(**item.dict()).returning(Flat.user_id)
         result = await sessions.execute(query)
+        # TODO поправить проверку доступа - например, добавив фильтр по user_id в where()
         await check_user(user, result)
         await sessions.commit()
         return result.scalar()

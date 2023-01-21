@@ -11,6 +11,7 @@ from db import engine_async
 
 
 async def get_renting(user: User):
+    # TODO перемеиновать - сейчас по нащванию кажется, что это получение одного рентинга
     async_session = sessionmaker(engine_async, expire_on_commit=False, class_=AsyncSession)
     async with async_session() as sessions:
         result = await sessions.execute(
@@ -28,6 +29,7 @@ async def create_renting(item: RentingCreate, user: User):
         item_dict['lease_range'] = [parse_date(item_dict['lease_range']['from_']),
                                     parse_date(item_dict['lease_range']['to_'])]
         if not await check_date_is_free(sessions, item_dict):
+            # TODO реальный текст написать
             raise 'sdfsdf'
         renting_instance = Renting(**item_dict)
         sessions.add(renting_instance)
