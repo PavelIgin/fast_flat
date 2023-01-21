@@ -26,11 +26,29 @@ async def get_flat_instance(pk: UUID):
         return result.scalar()
 
 
-async def update_flat(pk: UUID, item: FlatUpdate, user):
+async def update_flat(pk: UUID, item: FlatUpdate, user: User):
+    """Обновить данные о квартире.
+    Args:
+        pk: UUID квартиры
+        item: Форма с новыми данными о квартире
+        user: Пользователь, выполняющий запрос
+
+    Raises:
+        NotFoundOrAccessDenied.
+
+    Returns:
+        Объект обновленной квартиры.
+    """
     async_session = sessionmaker(engine_async, expire_on_commit=False, class_=AsyncSession)
     async with async_session() as sessions:
-        query = update(Flat).where(Flat.id == pk).values(**item.dict()).returning(Flat.user_id)
+        query = update(Flat).where(
+            Flat.id == pk,
+            Flat.user_id == user.id
+        ).values(**item.dict()).returning(Flat.user_id)
         result = await sessions.execute(query)
+        if not result:
+            # TODO перенести в messages.py
+            raise Exception('Объект не найден или недоступен для редактирования.')
         await check_user(user, result)
         await sessions.commit()
         return result.scalar()

@@ -10,6 +10,7 @@ from base import Base
 
 
 class Flat(Base):
+    """Модель квартиры как отдельного объекта."""
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True, unique=True, server_default=text('uuid_generate_v4()'))
     cost = Column(BigInteger)
     user_id = Column(GUID, ForeignKey('user.id'))
