@@ -48,7 +48,7 @@ class FlatUpdate(BaseModel):
 class FlatCreate(BaseModel):
     cost: int
     is_active: bool
-    photos: List[PhotoSchema] = None
+    photos: List[str] = None
 
     class Config:
         orm_mode = True

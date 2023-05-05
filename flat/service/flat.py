@@ -3,17 +3,26 @@ import asyncio
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import update
 from sqlalchemy.orm import selectinload, joinedload
-from sqlalchemy.orm.attributes import set_committed_value
 from sqlalchemy import select
 
 from flat.models import Flat, Photo
-from flat.schemas import FlatCreate, FlatUpdate
+from flat.schemas import FlatCreate, FlatUpdate, FlatSchema
 from .photo import create_photo_and_s3_object
 from users.models import User
+
+from sqlalchemy import inspect
 
 
 async def get_flat_list(db: AsyncSession):
     result = await db.execute(select(Flat).
+                              options(joinedload(Flat.user),
+                                      joinedload(Flat.photos).load_only(Photo.photo)).distinct())
+    flats = result.unique().scalars().all()
+    return flats
+
+
+async def get_private_flats(db: AsyncSession, user: User):
+    result = await db.execute(select(Flat).where(Flat.user_id == user.id).
                               options(joinedload(Flat.user),
                                       joinedload(Flat.photos).load_only(Photo.photo)).distinct())
     flats = result.unique().scalars().all()
@@ -41,11 +50,22 @@ async def create_flat(item: FlatCreate, user: User, db: AsyncSession):
     flat_instance = Flat(**item_dict)
     db.add(flat_instance)
     await db.commit()
+    dict_item = object_as_dict(flat_instance)
     if photo_list:
         list_tasks = []
+        saved_photos = []
         for photo in photo_list:
             item_dict_photo = {'photo': photo, 'flat_id': flat_instance.id}
             task = asyncio.create_task(create_photo_and_s3_object(item_dict_photo))
             list_tasks.append(task)
-        await asyncio.gather(*list_tasks)
-    return flat_instance
+        photos_gather = await asyncio.gather(*list_tasks)
+        for photo in photos_gather:
+            saved_photos.append({'id': photo.id, 'photo': photo.photo})
+        dict_item['photos'] = saved_photos
+    flat_serializer = FlatSchema(**dict_item)
+    return flat_serializer
+
+
+def object_as_dict(obj):
+    return {c.key: getattr(obj, c.key)
+            for c in inspect(obj).mapper.column_attrs}
