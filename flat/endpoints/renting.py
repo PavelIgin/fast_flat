@@ -9,7 +9,6 @@ from users.models import fastapi_user, User
 
 from flat.schemas import RentingCreate, RentingSchema
 from flat.service import create_renting, list_renting, renting_approve
-
 from core.db import get_db
 
 current_user = fastapi_user.current_user()
@@ -22,7 +21,7 @@ async def renting_create(item: RentingCreate, user: User = Depends(current_user)
     return await create_renting(item, user, db)
 
 
-@app.get('', response_model=List[RentingSchema])
+@app.get('/private', response_model=List[RentingSchema])
 async def renting_get(user: User = Depends(current_user), db: Session = Depends(get_db)):
     return await list_renting(user, db)
 

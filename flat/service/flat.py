@@ -1,11 +1,11 @@
 from uuid import UUID
 import asyncio
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import update
-from sqlalchemy.orm import selectinload, joinedload
-from sqlalchemy import select
+from sqlalchemy import update, select
+from sqlalchemy.orm import selectinload, joinedload, with_expression
+from sqlalchemy import func
 
-from flat.models import Flat, Photo
+from flat.models import Flat, Photo, Renting
 from flat.schemas import FlatCreate, FlatUpdate, FlatSchema
 from .photo import create_photo_and_s3_object
 from users.models import User
@@ -22,16 +22,29 @@ async def get_flat_list(db: AsyncSession):
 
 
 async def get_private_flats(db: AsyncSession, user: User):
-    result = await db.execute(select(Flat).where(Flat.user_id == user.id).
-                              options(joinedload(Flat.user),
-                                      joinedload(Flat.photos).load_only(Photo.photo)).distinct())
-    flats = result.unique().scalars().all()
-    return flats
+    subq = select(Renting).subquery()
+    stmt = select(Flat,
+                  Flat.count_rentings).group_by(Flat.id
+                                                ).join(subq,
+                                                       Flat.id == subq.c.flat_id).options(
+        with_expression(Flat.count_rentings, func.count(subq.c.id).label('count_rentings')),
+        joinedload(Flat.user),
+        joinedload(Flat.photos).load_only(Photo.photo)).distinct()
+    flats = await db.execute(stmt)
+    return flats.unique().scalars().all()
+
+
+async def get_private_flat_instance(pk: UUID, db: AsyncSession):
+    result = await db.execute(select(Flat).where(Flat.id == pk).options(selectinload(Flat.user),
+                                                                        joinedload(Flat.photos).load_only(Photo.photo),
+                                                                        joinedload(Flat.rentings)))
+    flat = result.scalar()
+    return flat
 
 
 async def get_flat_instance(pk: UUID, db: AsyncSession):
     result = await db.execute(select(Flat).where(Flat.id == pk).options(selectinload(Flat.user),
-                                                                        joinedload(Flat.photos).load_only('photo')))
+                                                                        joinedload(Flat.photos).load_only(Photo.photo)))
     flat = result.scalar()
     return flat
 

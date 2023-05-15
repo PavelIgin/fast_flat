@@ -2,7 +2,7 @@ import uuid
 
 from sqlalchemy import Column, BigInteger, ForeignKey, SmallInteger, text, Boolean
 from sqlalchemy.dialects.postgresql import UUID, DATERANGE
-from sqlalchemy.orm import relationship, validates
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql import expression
 
 from fastapi_users_db_sqlalchemy import GUID

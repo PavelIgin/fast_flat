@@ -6,9 +6,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic.datetime_parse import parse_date
 from flat.models import Renting, Flat
 from flat.schemas import RentingCreate
+from flat.permissions import check_flat_owner
+
 from users.models import User
 from sqlalchemy.sql.expression import exists
 from datetime import timedelta
+
+
 async def list_renting(user: User, db: AsyncSession):
     result = await db.execute(
         select(Renting).where(Renting.user_id == user.id)
@@ -32,9 +36,8 @@ async def create_renting(item: RentingCreate, user: User, db: AsyncSession):
 
 
 async def renting_approve(pk: uuid.UUID, user, db: AsyncSession):
-    if not await user_is_owner(pk, user, db):
-        raise 'user is not owner'
-    instance = update(Renting).where(Renting.id == pk).values(is_approved=True)
+    await check_flat_owner(pk, user, db)
+    instance = update(Renting).where(Renting.id == pk).values(status=True)
     await db.execute(instance)
     await db.commit()
 

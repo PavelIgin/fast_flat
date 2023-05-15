@@ -1,8 +1,27 @@
-from typing import Optional, List, Dict
+import datetime
+from typing import List, Optional, Tuple, Dict
 
 from pydantic import BaseModel, UUID4, AnyUrl
 from users.shemas import UserForFlat
-from .photo import PhotoCreateSchema
+
+
+class LeaseRangeSchema(BaseModel):
+
+    lower: datetime.date = None
+    upper: datetime.date = None
+
+    class Config:
+        orm_mode = True
+
+
+class RentingSchema(BaseModel):
+    id: UUID4
+    lease_range: LeaseRangeSchema
+    count_guest: int
+    status: Optional[bool] = None
+
+    class Config:
+        orm_mode = True
 
 
 class PhotoSchema(BaseModel):
@@ -27,6 +46,37 @@ class FlatSchema(BaseModel):
         orm_mode = True
 
 
+class FlatPrivateSchema(BaseModel):
+    id: UUID4
+    cost: int
+    count_rentings: int
+    photos: List[PhotoSchema] = None
+    user: Optional[UserForFlat] = None
+    quadrature: int = None
+    floor: int = None
+    address: str = None
+    is_active: Optional[bool] = None
+
+    class Config:
+        orm_mode = True
+
+
+class FlatPrivateInstanceSchema(BaseModel):
+    id: UUID4
+    cost: int
+    #count_rentings: int
+    rentings: List[RentingSchema] = None
+    photos: List[PhotoSchema] = None
+    user: Optional[UserForFlat] = None
+    quadrature: int = None
+    floor: int = None
+    address: str = None
+    is_active: Optional[bool] = None
+
+    class Config:
+        orm_mode = True
+
+
 class FlatSchemaForRenting(BaseModel):
     id: UUID4
     cost: int
@@ -37,17 +87,27 @@ class FlatSchemaForRenting(BaseModel):
         orm_mode = True
 
 
-class FlatUpdate(BaseModel):
+class FlatUpdate(FlatSchema):
+
+    id: UUID4
     cost: int
-    is_active: bool
+    quadrature: int = None
+    floor: int = None
+    address: str = None
+    is_active: Optional[bool] = None
 
     class Config:
         orm_mode = True
 
 
 class FlatCreate(BaseModel):
+
     cost: int
-    is_active: bool
+    quadrature: int = None
+    floor: int = None
+    address: str = None
+    is_active: Optional[bool] = None
+
     photos: List[str] = None
 
     class Config:

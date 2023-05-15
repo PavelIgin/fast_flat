@@ -19,5 +19,6 @@ class Photo(Base):
     flat = relationship('Flat')
     photo = Column(URLType)
 
+
 photo = Photo.__table__
 

@@ -1,0 +1,1 @@
+from .flat_owner import check_flat_owner
