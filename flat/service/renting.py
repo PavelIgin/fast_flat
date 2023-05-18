@@ -42,6 +42,13 @@ async def renting_approve(pk: uuid.UUID, user, db: AsyncSession):
     await db.commit()
 
 
+async def renting_cancel(pk: uuid.UUID, user, db: AsyncSession):
+    await check_flat_owner(pk, user, db)
+    instance = update(Renting).where(Renting.id == pk).values(status=False)
+    await db.execute(instance)
+    await db.commit()
+
+
 async def user_is_owner(pk: uuid.UUID, user: User, sessions):
     rent_query = select(Renting).where(Renting.id == pk).join(Renting.flat)
     rent_instance = await sessions.execute(rent_query)

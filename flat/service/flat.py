@@ -56,6 +56,8 @@ async def update_flat(pk: UUID, item: FlatUpdate, user: User, db: AsyncSession):
     return result.scalar()
 
 
+
+
 async def create_flat(item: FlatCreate, user: User, db: AsyncSession):
     item_dict = item.dict()
     item_dict['user_id'] = user.id

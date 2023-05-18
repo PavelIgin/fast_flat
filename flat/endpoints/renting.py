@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from users.models import fastapi_user, User
 
 from flat.schemas import RentingCreate, RentingSchema
-from flat.service import create_renting, list_renting, renting_approve
+from flat.service import create_renting, list_renting, renting_approve, renting_cancel
 from core.db import get_db
 
 current_user = fastapi_user.current_user()
@@ -26,6 +26,11 @@ async def renting_get(user: User = Depends(current_user), db: Session = Depends(
     return await list_renting(user, db)
 
 
-@app.patch('')
+@app.patch('/approve/{pk}/')
 async def approve_renting(pk: uuid.UUID, user: User = Depends(current_user), db: Session = Depends(get_db)):
     return await renting_approve(pk, user, db)
+
+
+@app.patch('/cancel/{pk}/')
+async def cancel_renting(pk: uuid.UUID, user: User = Depends(current_user), db: Session = Depends(get_db)):
+    return await renting_cancel(pk, user, db)
