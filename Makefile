@@ -7,7 +7,7 @@ DOCKER_COMPOSE_TEST_CMD=docker-compose -p $(DOCKER_COMPOSE_PROJECT)pytest -f $(D
 FASTAPI_CONTAINER=web
 
 run:
-	$(DOCKER_COMPOSE_CMD) up
+	$(DOCKER_COMPOSE_CMD) --env-file .env up --build
 
 down:
 	$(DOCKER_COMPOSE_CMD) down
