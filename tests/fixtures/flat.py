@@ -1,6 +1,6 @@
 import pytest
 
-from flat.service import create_flat as create_flat_service
+from flat.service import post_flat_service
 from flat.schemas import FlatCreate
 from users.models import User
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -22,4 +22,4 @@ def create_flat(apply_migrations: None, created_user: User, db_connection: Async
         "address": "string",
         "is_active": True
     })
-    create_flat_service(item, created_user, db_connection)
+    post_flat_service(item, created_user, db_connection)

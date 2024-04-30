@@ -31,7 +31,7 @@ services:
   nginx:
     build: ./docker_configs/nginx/
     ports:
-      - 1337:80
+      - 8000:8000
     depends_on:
       - web
 

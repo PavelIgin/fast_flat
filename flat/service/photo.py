@@ -1,3 +1,5 @@
+import logging
+
 import os
 import aiohttp
 import aioboto3
@@ -6,20 +8,21 @@ from sqlalchemy import select
 from users.models import User
 from flat.schemas import PhotoCreateSchema
 from flat.models import Photo
+from flat.repositories import PhotoRepository
 from random import randint
-from db import async_session, env
-import logging
+from db import env
+
 env.read_env()
 logger = logging.getLogger(__name__)
 
 
-async def create_photo(item: PhotoCreateSchema, user: User, db: AsyncSession):
+async def create_photo(item: PhotoCreateSchema, user: User, session: AsyncSession):
     item_dict = item.dict()
     return await create_photo_and_s3_object(item_dict)
 
 
-async def get_list_photo(db: AsyncSession):
-    result = await db.execute(select(Photo))
+async def get_list_photo(session: AsyncSession):
+    result = await session.execute(select(Photo))
     return result.scalars().all()
 
 
@@ -43,7 +46,6 @@ async def create_photo_and_s3_object(item_dict: dict):
                 )
     item_dict['photo'] = env.str('BUCKET_URL', default='bucket url') + key
     photo_instance = Photo(**item_dict)
-    async with async_session() as db:
-        db.add(photo_instance)
-        await db.commit()
+    repository = PhotoRepository()
+    await repository.add(photo_instance)
     return photo_instance

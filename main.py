@@ -9,9 +9,9 @@ app = FastAPI()
 
 current_user = fastapi_user.current_user()
 
-app.include_router(flat.app, prefix='/flat')
-app.include_router(renting.app, prefix='/renting')
-app.include_router(photo.app, prefix='/photo')
+app.include_router(flat.app, prefix='/flat', tags=['flat'])
+app.include_router(renting.app, prefix='/renting', tags=['renting'])
+app.include_router(photo.app, prefix='/photo', tags=['photo'])
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],

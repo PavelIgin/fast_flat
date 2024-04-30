@@ -5,12 +5,12 @@ from db import async_session
 app = FastAPI()
 
 
-async def get_db():
-    db = async_session()
+async def get_session():
+    session = async_session()
     try:
-        yield db
+        yield session
     except:
-        await db.rollback()
+        await session.rollback()
         raise
     finally:
-        await db.close()
+        await session.close()
