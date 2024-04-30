@@ -1,5 +1,6 @@
 from typing import Optional
-from pydantic import BaseModel, UUID4, AnyUrl, Field
+
+from pydantic import UUID4, AnyUrl, BaseModel, Field
 
 
 class PhotoSchema(BaseModel):
@@ -13,7 +14,7 @@ class PhotoSchema(BaseModel):
 
 
 class PhotoCreateSchema(BaseModel):
-    photo: AnyUrl = Field(None, description='URL image')
+    photo: AnyUrl = Field(None, description="URL image")
     flat_id: UUID4
 
     class Config:

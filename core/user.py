@@ -4,11 +4,15 @@ from fastapi import Depends
 from fastapi_users_db_sqlalchemy import SQLAlchemyUserDatabase
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import sessionmaker
-from db import engine_async
+
 from base import Base
+from db import engine_async
 from users.models import User
 
-async_session_maker = sessionmaker(engine_async, class_=AsyncSession, expire_on_commit=False)
+
+async_session_maker = sessionmaker(
+    engine_async, class_=AsyncSession, expire_on_commit=False
+)
 
 
 async def create_db_and_tables():

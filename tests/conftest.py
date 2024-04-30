@@ -2,16 +2,17 @@ import asyncio
 import typing as t
 
 import pytest
+from asyncpg.exceptions import DuplicateDatabaseError, InvalidCatalogNameError
+from fastapi.testclient import TestClient
+from sqlalchemy import text
+from sqlalchemy.exc import DBAPIError, ProgrammingError
+from sqlalchemy.ext.asyncio import AsyncConnection, create_async_engine
+
 from alembic import command
 from alembic.config import Config
-
-from asyncpg.exceptions import DuplicateDatabaseError, InvalidCatalogNameError
-from sqlalchemy.ext.asyncio import AsyncConnection, create_async_engine
-from sqlalchemy.exc import DBAPIError, ProgrammingError
-from sqlalchemy import text
 from db import DATABASE_URL_ASYNC
-from fastapi.testclient import TestClient
 from main import app
+
 from .fixtures import *
 
 
@@ -76,5 +77,3 @@ async def apply_migrations() -> t.AsyncGenerator[t.Any, t.Any]:
 async def client(apply_migrations: None) -> TestClient:
     client = TestClient(app=app)
     return client
-
-

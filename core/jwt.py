@@ -1,14 +1,18 @@
 import os
 
 from environs import Env
+from fastapi_users.authentication import (
+    AuthenticationBackend,
+    BearerTransport,
+    JWTStrategy,
+)
 
-from fastapi_users.authentication import AuthenticationBackend, BearerTransport, JWTStrategy
 
-env_file = os.path.join('.env')
+env_file = os.path.join(".env")
 env = Env()
 env.read_env()
 
-SECRET = env.str('SECRET')
+SECRET = env.str("SECRET")
 
 bearer_transport = BearerTransport(tokenUrl="auth/jwt/login")
 

@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+
 from db import async_session
 
 

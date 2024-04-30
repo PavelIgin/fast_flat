@@ -1,10 +1,10 @@
 import datetime
+from typing import Any, Optional, Tuple, Type
 
-from typing import Type, Any, Optional, Tuple
-from pydantic import BaseModel, UUID4, ValidationError
+from pydantic import UUID4, BaseModel, ValidationError
 
-from flat.schemas import FlatSchemaForRenting
 from flat.messages import upper_date_more_then_lower
+from flat.schemas import FlatSchemaForRenting
 
 
 class DateRange(BaseModel):
@@ -12,7 +12,7 @@ class DateRange(BaseModel):
     end: Optional[datetime.date]
 
     def validate(cls: Type[datetime.date], value: Any):
-        if value['start'] > value['end']:
+        if value["start"] > value["end"]:
             raise ValidationError(detail=upper_date_more_then_lower)
         return value
 

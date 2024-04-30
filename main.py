@@ -1,17 +1,19 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from core.jwt import auth_backend
+from flat.endpoints import flat, photo, renting
 from users.models import fastapi_user
 from users.shemas import UserCreate, UserRead
-from flat.endpoints import flat, renting, photo
-from fastapi.middleware.cors import CORSMiddleware
+
+
 app = FastAPI()
 
 current_user = fastapi_user.current_user()
 
-app.include_router(flat.app, prefix='/flat', tags=['flat'])
-app.include_router(renting.app, prefix='/renting', tags=['renting'])
-app.include_router(photo.app, prefix='/photo', tags=['photo'])
+app.include_router(flat.app, prefix="/flat", tags=["flat"])
+app.include_router(renting.app, prefix="/renting", tags=["renting"])
+app.include_router(photo.app, prefix="/photo", tags=["photo"])
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -29,4 +31,3 @@ app.include_router(
     prefix="/auth",
     tags=["auth"],
 )
-

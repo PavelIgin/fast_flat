@@ -22,4 +22,3 @@ class UserCreate(schemas.BaseUserCreate):
 
 class UserUpdate(schemas.BaseUserUpdate):
     telegram_contact: str = None
-

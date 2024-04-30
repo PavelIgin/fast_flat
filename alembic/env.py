@@ -1,14 +1,17 @@
-import typing as t
 import sys
+import typing as t
 
-sys.path = ['', '..'] + sys.path[1:]
+
+sys.path = ["", ".."] + sys.path[1:]
 
 from logging.config import fileConfig
+
+from sqlalchemy import engine_from_config, pool
+
 from alembic import context
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
-from db import DATABASE_URL_SYNC, engine
 from base.base import Base
+from db import DATABASE_URL_SYNC, engine
+
 
 config = context.config
 
@@ -52,14 +55,16 @@ def do_run_migrations(connection: t.Any) -> None:
 
 def run_migrations_online() -> None:
     configuration = config.get_section(config.config_ini_section)
-    configuration['sqlalchemy.url'] = DATABASE_URL_SYNC
+    configuration["sqlalchemy.url"] = DATABASE_URL_SYNC
     connectable = engine_from_config(
         configuration,
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )
     with connectable.connect() as connection:
-        context.configure(connection=connection, target_metadata=target_metadata)
+        context.configure(
+            connection=connection, target_metadata=target_metadata
+        )
 
         with context.begin_transaction():
             context.run_migrations()
@@ -75,7 +80,9 @@ async def async_run_migrations_online() -> None:
     connectable = engine
 
     async with connectable.connect() as connection:
-        context.configure(connection=connection, target_metadata=target_metadata)
+        context.configure(
+            connection=connection, target_metadata=target_metadata
+        )
         await connection.run_sync(do_run_migrations)
 
     await connectable.dispose()

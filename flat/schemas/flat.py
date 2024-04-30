@@ -1,7 +1,8 @@
 import datetime
-from typing import List, Optional, Tuple, Dict
+from typing import Dict, List, Optional, Tuple
 
-from pydantic import BaseModel, UUID4, AnyUrl
+from pydantic import UUID4, AnyUrl, BaseModel
+
 from users.shemas import UserForFlat
 
 
@@ -64,7 +65,7 @@ class FlatPrivateSchema(BaseModel):
 class FlatPrivateInstanceSchema(BaseModel):
     id: UUID4
     cost: int
-    #count_rentings: int
+    # count_rentings: int
     rentings: List[RentingSchema] = None
     photos: List[PhotoSchema] = None
     user: Optional[UserForFlat] = None

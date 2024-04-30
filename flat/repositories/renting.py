@@ -1,25 +1,25 @@
 import uuid
-from .base import BaseRepository
 
-
+from sqlalchemy import exists, func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import update, select, exists
-from sqlalchemy.orm import selectinload, joinedload, with_expression
-from sqlalchemy import func
+from sqlalchemy.orm import joinedload, selectinload, with_expression
 
 from flat.models import Flat, Photo, Renting
-from flat.schemas import FlatCreate, FlatUpdate, FlatSchema
-from .base import BaseRepository
+from flat.schemas import FlatCreate, FlatSchema, FlatUpdate
 from users.models import User
+
+from .base import BaseRepository
 
 
 class RentingRepository(BaseRepository):
 
     async def list_renting(self, user: User):
         result = await self.session.execute(
-            select(Renting).where(Renting.user_id == user.id)
-            .options(joinedload(Renting.user)).
-            options(joinedload(Renting.flat).joinedload(Flat.user)))
+            select(Renting)
+            .where(Renting.user_id == user.id)
+            .options(joinedload(Renting.user))
+            .options(joinedload(Renting.flat).joinedload(Flat.user))
+        )
         return result.scalars().all()
 
     async def renting_approve(self, pk: uuid.UUID):
@@ -36,11 +36,20 @@ class RentingRepository(BaseRepository):
         rent_query = select(Renting).where(Renting.id == pk).join(Renting.flat)
         rent_instance = await self.session.execute(rent_query)
         instance = select(Flat).where(
-            select(Flat).where(Flat.id == rent_instance.scalar().flat_id, Flat.user_id == user.id).exists())
+            select(Flat)
+            .where(
+                Flat.id == rent_instance.scalar().flat_id,
+                Flat.user_id == user.id,
+            )
+            .exists()
+        )
         result = await self.session.execute(instance)
         return result
 
     async def get_free_dates(self, item_dict):
         await self.session.execute(
-            select(exists(Renting)).filter(Renting.flat_id == item_dict['flat_id'], Renting.lease_range.overlaps(
-                item_dict['lease_range'])))
+            select(exists(Renting)).filter(
+                Renting.flat_id == item_dict["flat_id"],
+                Renting.lease_range.overlaps(item_dict["lease_range"]),
+            )
+        )
