@@ -5,7 +5,6 @@ from sqlalchemy.orm import joinedload, selectinload, with_expression
 
 from flat.models import Flat, Photo, Renting
 from flat.schemas import FlatUpdate
-from users.models import User
 
 from .base import BaseRepository
 
@@ -13,26 +12,23 @@ from .base import BaseRepository
 class FlatRepository(BaseRepository):
 
     async def list_flat(self):
-        return (
-            await self.session.execute(
-                select(Flat)
-                .options(
-                    joinedload(Flat.user),
-                    joinedload(Flat.photos).load_only(Photo.photo),
-                )
-                .distinct()
+        result = await self.session.execute(
+            select(Flat)
+            .options(
+                joinedload(Flat.user),
+                joinedload(Flat.photos).load_only(Photo.photo),
             )
-            .unique()
-            .scalars()
-            .all()
+            .distinct()
         )
+        return result.unique().scalars().all()
 
-    async def list_private(self):
+    async def list_private(self, user):
         subq = select(Renting).subquery()
         stmt = (
             select(Flat, Flat.count_rentings)
             .group_by(Flat.id)
             .join(subq, Flat.id == subq.c.flat_id)
+            .where(Flat.user_id == user.id)
             .options(
                 with_expression(
                     Flat.count_rentings,
@@ -43,8 +39,8 @@ class FlatRepository(BaseRepository):
             )
             .distinct()
         )
-        flats = await self.session.execute(stmt)
-        return flats.unique().scalars().all()
+        result = await self.session.execute(stmt)
+        return result.unique().scalars().all()
 
     async def retrieve_private(self, pk: UUID):
         result = await self.session.execute(
@@ -56,8 +52,7 @@ class FlatRepository(BaseRepository):
                 joinedload(Flat.rentings),
             )
         )
-        flat = result.scalar()
-        return flat
+        return result.scalar()
 
     async def retrieve_flat(self, pk: UUID):
         result = await self.session.execute(
@@ -68,16 +63,14 @@ class FlatRepository(BaseRepository):
                 joinedload(Flat.photos).load_only(Photo.photo),
             )
         )
-        flat = result.scalar()
-        return flat
+        return result.scalar()
 
-    async def update_flat(self, pk: UUID, item: FlatUpdate, user: User):
-        query = (
+    async def update_flat(self, pk: UUID, item: FlatUpdate):
+        result = await self.session.execute(
             update(Flat)
-            .where(Flat.id == pk, Flat.user_id == user.id)
+            .where(Flat.id == pk)
             .values(**item.dict())
             .returning(Flat.user_id)
         )
-        result = await self.session.execute(query)
         await self.session.commit()
         return result.scalar()

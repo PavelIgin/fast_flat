@@ -88,9 +88,8 @@ class FlatSchemaForRenting(BaseModel):
         orm_mode = True
 
 
-class FlatUpdate(FlatSchema):
+class FlatUpdate(BaseModel):
 
-    id: UUID4
     cost: int
     quadrature: int = None
     floor: int = None

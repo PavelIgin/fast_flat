@@ -63,7 +63,7 @@ async def retrieve_private(
     return await retrieve_private_service(pk, session)
 
 
-@app.patch("/{pk}", response_model=FlatUpdate)
+@app.patch("/{pk}", response_model=FlatSchema)
 async def update_flat(
     pk: uuid.UUID,
     item: FlatUpdate,

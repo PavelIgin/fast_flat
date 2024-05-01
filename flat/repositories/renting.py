@@ -45,9 +45,10 @@ class RentingRepository(BaseRepository):
         return result
 
     async def get_free_dates(self, item_dict):
-        await self.session.execute(
+        result = await self.session.execute(
             select(exists(Renting)).filter(
                 Renting.flat_id == item_dict["flat_id"],
                 Renting.lease_range.overlaps(item_dict["lease_range"]),
             )
         )
+        return result

@@ -32,7 +32,7 @@ async def create_renting_service(
         raise HTTPException(status_code=401, detail="DATE_ALREADY_RENTED")
     item_dict["status"] = None
     renting_instance = Renting(**item_dict)
-    await repository.add(user)
+    await repository.add(renting_instance)
     return renting_instance
 
 
