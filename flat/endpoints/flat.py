@@ -43,7 +43,7 @@ async def list_flat(session: Session = Depends(get_session)):
 
 @app.get("/private", response_model=List[FlatPrivateSchema])
 async def list_private(
-    session: Session = Depends(get_session()),
+    session: Session = Depends(get_session),
     user: User = Depends(current_user),
 ):
     return await list_private_service(session, user)
@@ -63,7 +63,7 @@ async def retrieve_private(
     return await retrieve_private_service(pk, session)
 
 
-@app.patch("/{pk}", response_model=FlatUpdate)
+@app.patch("/{pk}", response_model=FlatSchema)
 async def update_flat(
     pk: uuid.UUID,
     item: FlatUpdate,
