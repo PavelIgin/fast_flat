@@ -43,7 +43,7 @@ async def list_flat(session: Session = Depends(get_session)):
 
 @app.get("/private", response_model=List[FlatPrivateSchema])
 async def list_private(
-    session: Session = Depends(get_session()),
+    session: Session = Depends(get_session),
     user: User = Depends(current_user),
 ):
     return await list_private_service(session, user)
