@@ -7,7 +7,6 @@ from fastapi_users.authentication import (
     JWTStrategy,
 )
 
-
 env_file = os.path.join(".env")
 env = Env()
 env.read_env()

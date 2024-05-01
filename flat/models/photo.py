@@ -1,4 +1,3 @@
-import os
 import uuid
 
 from fastapi_users_db_sqlalchemy import GUID

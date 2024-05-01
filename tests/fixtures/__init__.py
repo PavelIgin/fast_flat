@@ -1,2 +1,2 @@
-from .user import *
 from .flat import *
+from .user import *

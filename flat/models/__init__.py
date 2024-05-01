@@ -1,5 +1,5 @@
 from .flat import Flat, flat
-from .renting import Renting
 from .photo import Photo
+from .renting import Renting
 
 __all__ = ["Flat", "Photo"]

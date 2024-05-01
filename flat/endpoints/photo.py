@@ -6,7 +6,6 @@ from flat.schemas import PhotoCreateSchema, PhotoSchema
 from flat.service import create_photo
 from users.models import User, fastapi_user
 
-
 current_user = fastapi_user.current_user()
 
 app = APIRouter()

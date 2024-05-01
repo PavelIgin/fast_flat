@@ -5,17 +5,15 @@ from uuid import UUID
 
 import pika
 from environs import Env
-from sqlalchemy import func, inspect, select, update
+from sqlalchemy import inspect
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import joinedload, selectinload, with_expression
 
-from flat.models import Flat, Photo, Renting
+from flat.models import Flat
 from flat.repositories import FlatRepository
 from flat.schemas import FlatCreate, FlatSchema, FlatUpdate
 from users.models import User
 
 from .photo import create_photo_and_s3_object
-
 
 env_file = os.path.join(".env")
 env = Env()

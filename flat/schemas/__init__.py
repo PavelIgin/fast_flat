@@ -1,11 +1,11 @@
 from .flat import (
-    FlatSchema,
     FlatCreate,
-    FlatUpdate,
     FlatID,
-    FlatSchemaForRenting,
-    FlatPrivateSchema,
     FlatPrivateInstanceSchema,
+    FlatPrivateSchema,
+    FlatSchema,
+    FlatSchemaForRenting,
+    FlatUpdate,
 )
-from .renting import RentingSchema, RentingCreate
 from .photo import PhotoCreateSchema, PhotoSchema
+from .renting import RentingCreate, RentingSchema

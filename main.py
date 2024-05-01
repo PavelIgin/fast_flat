@@ -6,7 +6,6 @@ from flat.endpoints import flat, photo, renting
 from users.models import fastapi_user
 from users.shemas import UserCreate, UserRead
 
-
 app = FastAPI()
 
 current_user = fastapi_user.current_user()

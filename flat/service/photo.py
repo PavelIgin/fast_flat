@@ -13,7 +13,6 @@ from flat.repositories import PhotoRepository
 from flat.schemas import PhotoCreateSchema
 from users.models import User
 
-
 env.read_env()
 logger = logging.getLogger(__name__)
 

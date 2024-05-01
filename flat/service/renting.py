@@ -3,7 +3,6 @@ from datetime import timedelta
 
 from fastapi import HTTPException
 from pydantic.datetime_parse import parse_date
-from sqlalchemy import update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from flat.models import Renting

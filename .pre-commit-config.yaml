@@ -1,12 +1,14 @@
+default_stages: [ commit ]
 repos:
   - repo: local
     hooks:
       - id: isort
-        name: isort
-        entry: isort --settings-file ./.isort.cfg .
-        language: system
-        types: [python]
-        pass_filenames: false
+        name: isort (python)
+        entry: isort
+        language: python
+        language_version: python3.10
+        types: [ python ]
+        args: [ -v, --profile=black]
 
       - id: black
         name: black

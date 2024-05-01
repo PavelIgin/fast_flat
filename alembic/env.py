@@ -1,7 +1,6 @@
 import sys
 import typing as t
 
-
 sys.path = ["", ".."] + sys.path[1:]
 
 from logging.config import fileConfig
@@ -11,7 +10,6 @@ from sqlalchemy import engine_from_config, pool
 from alembic import context
 from base.base import Base
 from db import DATABASE_URL_SYNC, engine
-
 
 config = context.config
 

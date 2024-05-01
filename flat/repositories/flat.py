@@ -1,11 +1,10 @@
 from uuid import UUID
 
 from sqlalchemy import func, select, update
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload, selectinload, with_expression
 
 from flat.models import Flat, Photo, Renting
-from flat.schemas import FlatCreate, FlatSchema, FlatUpdate
+from flat.schemas import FlatUpdate
 from users.models import User
 
 from .base import BaseRepository
