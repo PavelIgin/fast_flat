@@ -5,12 +5,13 @@ from uuid import UUID
 
 import pika
 from environs import Env
+from schemas import FlatPrivateSchema
 from sqlalchemy import inspect
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from flat.models import Flat
 from flat.repositories import FlatRepository
-from flat.schemas import FlatCreate, FlatSchema, FlatUpdate
+from flat.schemas import FlatCreate, FlatUpdate
 from users.models import User
 
 from .photo import create_photo_and_s3_object
@@ -31,9 +32,9 @@ async def list_flat_service(session: AsyncSession):
     return result
 
 
-async def list_private_service(session: AsyncSession):
+async def list_private_service(session: AsyncSession, user):
     repository = FlatRepository(session=session)
-    result = await repository.list_private()
+    result = await repository.list_private(user)
     return result
 
 
@@ -53,7 +54,8 @@ async def update_flat_service(
     pk: UUID, item: FlatUpdate, user: User, session: AsyncSession
 ):
     repository = FlatRepository(session=session)
-    result = await repository.update_flat(pk, item, user)
+    await repository.update_flat(pk, item)
+    result = await repository.retrieve_flat(pk)
     return result
 
 
@@ -80,7 +82,7 @@ async def post_flat_service(
         for photo in photos_gather:
             saved_photos.append({"id": photo.id, "photo": photo.photo})
         dict_item["photos"] = saved_photos
-    flat_serializer = FlatSchema(**dict_item)
+    flat_serializer = FlatPrivateSchema(**dict_item)
     await send_message_about_created_flat_service(dict_item)
     return flat_serializer
 
@@ -96,6 +98,8 @@ async def send_message_about_created_flat_service(dict_item):
     message.pop("user_id")
     message.pop("count_rentings")
     message.pop("cost")
+    message.pop("id")
+    message.pop("photos")
     dict_item["id"] = str(dict_item["id"])
     con = pika.ConnectionParameters(
         host=RABBITMQ_HOST,

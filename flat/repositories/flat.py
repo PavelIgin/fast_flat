@@ -1,52 +1,71 @@
 from uuid import UUID
 
+from enums import PromotionEnum
 from sqlalchemy import func, select, update
 from sqlalchemy.orm import joinedload, selectinload, with_expression
 
-from flat.models import Flat, Photo, Renting
+from flat.models import Flat, Photo, Promotion, Renting
 from flat.schemas import FlatUpdate
-from users.models import User
 
 from .base import BaseRepository
 
 
 class FlatRepository(BaseRepository):
 
-    async def list_flat(self):
-        return (
-            await self.session.execute(
-                select(Flat)
-                .options(
-                    joinedload(Flat.user),
-                    joinedload(Flat.photos).load_only(Photo.photo),
-                )
-                .distinct()
-            )
-            .unique()
-            .scalars()
-            .all()
-        )
+    @staticmethod
+    def get_type_promotion():
+        return func.coalesce(
+            select(Promotion.type)
+            .where(Promotion.flat_id == Flat.id)
+            .order_by(Promotion.start.desc())
+            .limit(1),
+            PromotionEnum.DEFAULT,
+        ).label("type_promotion")
 
-    async def list_private(self):
-        subq = select(Renting).subquery()
+    async def list_flat(self):
+        type_promotion = self.get_type_promotion()
+        query = await self.session.execute(
+            select(
+                Flat,
+            )
+            .options(
+                joinedload(Flat.user),
+                joinedload(Flat.photos),
+                with_expression(
+                    Flat.type_promotion,
+                    type_promotion,
+                ),
+            )
+            .order_by(type_promotion.desc())
+        )
+        result = query.unique().scalars().all()
+        return result
+
+    async def list_private(self, user):
+        type_promotion = self.get_type_promotion()
         stmt = (
             select(Flat, Flat.count_rentings)
             .group_by(Flat.id)
-            .join(subq, Flat.id == subq.c.flat_id)
+            .outerjoin(Renting, Flat.id == Renting.flat_id)
+            .where(Flat.user_id == user.id)
             .options(
                 with_expression(
                     Flat.count_rentings,
-                    func.count(subq.c.id).label("count_rentings"),
+                    func.count(Renting.flat_id).label("count_rentings"),
+                ),
+                with_expression(
+                    Flat.type_promotion,
+                    type_promotion,
                 ),
                 joinedload(Flat.user),
                 joinedload(Flat.photos).load_only(Photo.photo),
             )
-            .distinct()
         )
-        flats = await self.session.execute(stmt)
-        return flats.unique().scalars().all()
+        result = await self.session.execute(stmt)
+        return result.unique().scalars().all()
 
     async def retrieve_private(self, pk: UUID):
+        type_promotion = self.get_type_promotion()
         result = await self.session.execute(
             select(Flat)
             .where(Flat.id == pk)
@@ -54,30 +73,36 @@ class FlatRepository(BaseRepository):
                 selectinload(Flat.user),
                 joinedload(Flat.photos).load_only(Photo.photo),
                 joinedload(Flat.rentings),
+                with_expression(
+                    Flat.type_promotion,
+                    type_promotion,
+                ),
             )
         )
-        flat = result.scalar()
-        return flat
+        return result.scalar()
 
     async def retrieve_flat(self, pk: UUID):
+        type_promotion = self.get_type_promotion()
         result = await self.session.execute(
             select(Flat)
             .where(Flat.id == pk)
             .options(
                 selectinload(Flat.user),
                 joinedload(Flat.photos).load_only(Photo.photo),
+                with_expression(
+                    Flat.type_promotion,
+                    type_promotion,
+                ),
             )
         )
-        flat = result.scalar()
-        return flat
+        return result.scalar()
 
-    async def update_flat(self, pk: UUID, item: FlatUpdate, user: User):
-        query = (
+    async def update_flat(self, pk: UUID, item: FlatUpdate):
+        result = await self.session.execute(
             update(Flat)
-            .where(Flat.id == pk, Flat.user_id == user.id)
+            .where(Flat.id == pk)
             .values(**item.dict())
             .returning(Flat.user_id)
         )
-        result = await self.session.execute(query)
         await self.session.commit()
         return result.scalar()

@@ -1,0 +1,1 @@
+from .promotion import PromotionEnum

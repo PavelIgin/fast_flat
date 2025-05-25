@@ -23,15 +23,15 @@ services:
     image: postgres:12.0-alpine
     volumes:
       - postgres_data:/var/lib/postgresql/data/
-    expose:
-      - "5432"
+    ports:
+      - "5432:5432"
     env_file:
       - .env
 
   nginx:
     build: ./docker_configs/nginx/
     ports:
-      - 8000:8000
+      - 8000:80
     depends_on:
       - web
 

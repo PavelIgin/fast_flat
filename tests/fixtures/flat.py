@@ -2,8 +2,10 @@ import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from flat.schemas import FlatCreate
-from flat.service import post_flat_service
+from flat.service import flat_services
 from users.models import User
+
+__all__ = ("create_flat",)
 
 
 @pytest.fixture(scope="session")
@@ -24,4 +26,4 @@ def create_flat(
             "is_active": True,
         }
     )
-    post_flat_service(item, created_user, db_connection)
+    flat_services.post_flat_service(item, created_user, db_connection)

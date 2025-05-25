@@ -25,7 +25,7 @@ class RentingSchema(BaseModel):
     status: Optional[bool] = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class RentingCreate(BaseModel):
@@ -35,4 +35,4 @@ class RentingCreate(BaseModel):
     flat_id: UUID4
 
     class Config:
-        orm_mode = True
+        from_attributes = True

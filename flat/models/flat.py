@@ -41,6 +41,7 @@ class Flat(Base):
         Boolean, nullable=False, default=False, server_default="f"
     )
     count_rentings = query_expression()
+    type_promotion = query_expression()
 
     user = relationship("User")
     photos = relationship("Photo")
