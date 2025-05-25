@@ -1,6 +1,7 @@
 import datetime
 from typing import List, Optional
 
+from enums import PromotionEnum
 from pydantic import UUID4, AnyUrl, BaseModel
 
 from users.shemas import UserForFlat
@@ -12,7 +13,7 @@ class LeaseRangeSchema(BaseModel):
     upper: datetime.date = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class RentingSchema(BaseModel):
@@ -22,7 +23,7 @@ class RentingSchema(BaseModel):
     status: Optional[bool] = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class PhotoSchema(BaseModel):
@@ -30,18 +31,19 @@ class PhotoSchema(BaseModel):
     id: UUID4
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class FlatSchema(BaseModel):
     id: UUID4
     cost: int
     photos: List[PhotoSchema] = None
-    user: Optional[UserForFlat] = None
-    quadrature: int = None
-    floor: int = None
-    address: str = None
-    is_active: Optional[bool] = None
+    user: Optional[UserForFlat]
+    quadrature: Optional[int]
+    floor: Optional[int]
+    address: Optional[str]
+    is_active: Optional[bool]
+    type_promotion: int
 
     class Config:
         orm_mode = True
@@ -50,16 +52,16 @@ class FlatSchema(BaseModel):
 class FlatPrivateSchema(BaseModel):
     id: UUID4
     cost: int
-    count_rentings: int
-    photos: List[PhotoSchema] = None
-    user: Optional[UserForFlat] = None
-    quadrature: int = None
-    floor: int = None
-    address: str = None
-    is_active: Optional[bool] = None
+    count_rentings: Optional[int]
+    photos: Optional[List[PhotoSchema]] = None
+    quadrature: Optional[int]
+    floor: Optional[int]
+    address: Optional[str]
+    is_active: Optional[bool]
+    type_promotion: Optional[int] = PromotionEnum.DEFAULT
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class FlatPrivateInstanceSchema(BaseModel):
@@ -68,14 +70,14 @@ class FlatPrivateInstanceSchema(BaseModel):
     # count_rentings: int
     rentings: List[RentingSchema] = None
     photos: List[PhotoSchema] = None
-    user: Optional[UserForFlat] = None
-    quadrature: int = None
-    floor: int = None
-    address: str = None
-    is_active: Optional[bool] = None
+    user: Optional[UserForFlat]
+    quadrature: Optional[int]
+    floor: Optional[int]
+    address: Optional[str]
+    is_active: Optional[bool]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class FlatSchemaForRenting(BaseModel):
@@ -85,7 +87,7 @@ class FlatSchemaForRenting(BaseModel):
     is_active: Optional[bool] = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class FlatUpdate(BaseModel):
@@ -97,7 +99,7 @@ class FlatUpdate(BaseModel):
     is_active: Optional[bool] = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class FlatCreate(BaseModel):
@@ -111,7 +113,7 @@ class FlatCreate(BaseModel):
     photos: List[str] = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class FlatID(BaseModel):

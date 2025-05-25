@@ -5,12 +5,13 @@ from uuid import UUID
 
 import pika
 from environs import Env
+from schemas import FlatPrivateSchema
 from sqlalchemy import inspect
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from flat.models import Flat
 from flat.repositories import FlatRepository
-from flat.schemas import FlatCreate, FlatSchema, FlatUpdate
+from flat.schemas import FlatCreate, FlatUpdate
 from users.models import User
 
 from .photo import create_photo_and_s3_object
@@ -81,7 +82,7 @@ async def post_flat_service(
         for photo in photos_gather:
             saved_photos.append({"id": photo.id, "photo": photo.photo})
         dict_item["photos"] = saved_photos
-    flat_serializer = FlatSchema(**dict_item)
+    flat_serializer = FlatPrivateSchema(**dict_item)
     await send_message_about_created_flat_service(dict_item)
     return flat_serializer
 

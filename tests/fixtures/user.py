@@ -1,5 +1,7 @@
 import pytest
 
+__all__ = ("created_user", "auth_user")
+
 
 @pytest.fixture()
 async def created_user(apply_migrations: None, client):
@@ -15,7 +17,9 @@ async def auth_user(created_user, client):
     """Main fixture of user."""
     response = client.post(
         url="/auth/jwt/login",
-        json={"email": "useaaar@example.com", "password": "string"},
+        data={
+            "username": created_user["email"],
+            "password": created_user["password"],
+        },
     )
-    print(response)
-    return response["access_token"]
+    return response.json()["access_token"]

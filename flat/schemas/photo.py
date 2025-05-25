@@ -10,7 +10,7 @@ class PhotoSchema(BaseModel):
     is_active: Optional[bool] = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class PhotoCreateSchema(BaseModel):
@@ -18,4 +18,4 @@ class PhotoCreateSchema(BaseModel):
     flat_id: UUID4
 
     class Config:
-        orm_mode = True
+        from_attributes = True

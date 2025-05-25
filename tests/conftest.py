@@ -12,8 +12,7 @@ from alembic import command
 from alembic.config import Config
 from db import DATABASE_URL_ASYNC
 from main import app
-
-from .fixtures import *
+from tests.fixtures import *
 
 
 @pytest.fixture()
