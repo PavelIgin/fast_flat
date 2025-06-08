@@ -2,9 +2,6 @@ import uuid
 from datetime import timedelta
 
 from fastapi import HTTPException
-
-# from pydantic.datetime_parse import parse_datetime
-# todo подумать над алтернативой
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from flat.models import Renting
@@ -22,12 +19,12 @@ async def list_renting_service(user: User, session: AsyncSession):
 async def create_renting_service(
     item: RentingCreate, user: User, session: AsyncSession
 ):
-    item_dict = item.dict()
+    item_dict = item.model_dump()
     item_dict["user_id"] = user.id
     # todo понять что делать
     item_dict["lease_range"] = [
-        # parse_date(item_dict["lease_range"]["start"]),
-        # parse_date(item_dict["lease_range"]["end"]),
+        item_dict["lease_range"]["start"],
+        item_dict["lease_range"]["end"],
     ]
     repository = RentingRepository(session=session)
     result = await repository.get_free_dates(item_dict)

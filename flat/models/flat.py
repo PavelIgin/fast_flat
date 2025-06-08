@@ -27,16 +27,10 @@ class Flat(Base):
         server_default=text("uuid_generate_v4()"),
     )
     cost = Column(Integer)
-    quadrature = Column(
-        Integer,
-    )
-    floor = Column(
-        Integer,
-    )
-    address = Column(
-        String,
-    )
-    user_id = Column(GUID, ForeignKey("user.id"))
+    quadrature = Column(Integer, nullable=False)
+    floor = Column(Integer, nullable=False)
+    address = Column(String, nullable=False)
+    user_id = Column(GUID, ForeignKey("user.id"), nullable=False)
     is_active = Column(
         Boolean, nullable=False, default=False, server_default="f"
     )
@@ -48,10 +42,10 @@ class Flat(Base):
     rentings = relationship("Renting")
 
     __table_args__ = (
-        CheckConstraint(floor >= 0, name="check_bar_positive"),
-        CheckConstraint(quadrature >= 0, name="check_bar_positive"),
+        CheckConstraint(floor >= 0, name="check_floor_positive"),
+        CheckConstraint(quadrature >= 0, name="check_quadrature_positive"),
         {},
     )
 
 
-flat = Flat.__table__
+# flat = Flat.__table__

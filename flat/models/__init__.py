@@ -1,4 +1,4 @@
-from .flat import Flat, flat
+from .flat import Flat
 from .photo import Photo
 from .promotion import Promotion
 from .renting import Renting

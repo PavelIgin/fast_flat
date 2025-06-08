@@ -1,7 +1,7 @@
 import uuid
 
 from fastapi_users_db_sqlalchemy import GUID
-from sqlalchemy import (
+from sqlalchemy import (  # Date,
     BigInteger,
     Boolean,
     Column,
@@ -26,7 +26,9 @@ class Renting(Base):
         default=uuid.uuid4,
         server_default=text("uuid_generate_v4()"),
     )
-    lease_range = Column(DATERANGE(), nullable=False)
+    lease_range = Column(DATERANGE, nullable=False)
+    # start = Column(Date, nullable=False) # todo переделать на 2 отдельных поля т.к с выдачей таких данных тяжеловато,
+    # end = Column(Date, nullable=False)
     cost = Column(BigInteger)
     count_guest = Column(SmallInteger)
 
@@ -34,7 +36,7 @@ class Renting(Base):
     flat_id = Column(UUID(as_uuid=True), ForeignKey("flat.id"))
 
     user = relationship("User")
-    flat = relationship("Flat")
+    flat = relationship("Flat", back_populates="rentings")
 
     status = Column(
         Boolean, default=False, server_default=expression.null(), nullable=True

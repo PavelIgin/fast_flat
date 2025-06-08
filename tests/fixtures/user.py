@@ -1,25 +1,36 @@
 import pytest
 
-__all__ = ("created_user", "auth_user")
+__all__ = ("user", "auth_user")
+
+from fastapi_users import BaseUserManager, models
+from fastapi_users.db import BaseUserDatabase
+from fastapi_users.manager import UserManagerDependency
+from fastapi_users.schemas import BaseUserCreate
+from fastapi_users_db_sqlalchemy import SQLAlchemyUserDatabase
+
+from base.base import User
 
 
-@pytest.fixture()
-async def created_user(apply_migrations: None, client):
+@pytest.fixture(scope="session")
+async def user(client, db_session):
     """Main fixture of user."""
-    data = {"email": "useaqqaar@example.com", "password": "stqring"}
-    response = client.post(url="/auth/register/", json=data)
-    assert response.status_code == 201
+    data = dict(email="useaqqaar@example.com", password="string")
+    schema = BaseUserCreate(email="useaqqaar@example.com", password="string")
+    user = await BaseUserManager(
+        SQLAlchemyUserDatabase(session=db_session, user_table=User)
+    ).create(user_create=schema)
+    data["id"] = user.id
     return data
 
 
 @pytest.fixture()
-async def auth_user(created_user, client):
+async def auth_user(user, client) -> dict:
     """Main fixture of user."""
     response = client.post(
         url="/auth/jwt/login",
         data={
-            "username": created_user["email"],
-            "password": created_user["password"],
+            "username": user["email"],
+            "password": user["password"],
         },
     )
     return response.json()["access_token"]

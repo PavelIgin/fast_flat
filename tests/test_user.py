@@ -12,12 +12,12 @@ async def test_create_user(client: TestClient):
 
 
 @pytest.mark.anyio
-async def test_login_user(client: TestClient, created_user: dict):
+async def test_login_user(client: TestClient, user: dict):
     response = client.post(
         url="/auth/jwt/login",
         data={
-            "username": created_user["email"],
-            "password": created_user["password"],
+            "username": user["email"],
+            "password": user["password"],
         },
     )
     assert response.status_code == 200

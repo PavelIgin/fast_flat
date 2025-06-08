@@ -19,8 +19,8 @@ class Photo(Base):
         server_default=text("uuid_generate_v4()"),
     )
     flat_id = Column(GUID, ForeignKey("flat.id"))
-    flat = relationship("Flat")
+    flat = relationship("Flat", back_populates="photos")
     photo = Column(URLType)
 
 
-photo = Photo.__table__
+# photo = Photo.__table__

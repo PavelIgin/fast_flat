@@ -2,25 +2,27 @@ import asyncio
 import typing as t
 
 import pytest
-from asyncpg.exceptions import DuplicateDatabaseError, InvalidCatalogNameError
+from environs import Env
 from fastapi.testclient import TestClient
-from sqlalchemy import text
-from sqlalchemy.exc import DBAPIError, ProgrammingError
-from sqlalchemy.ext.asyncio import AsyncConnection, create_async_engine
+from sqlalchemy.ext.asyncio import (
+    AsyncConnection,
+    AsyncSession,
+    create_async_engine,
+)
 
-from alembic import command
-from alembic.config import Config
-from db import DATABASE_URL_ASYNC
-from main import app
-from tests.fixtures import *
+from base import Base
+from db import DATABASE_URL_ASYNC, async_session
+from main import app, engine
+
+env = Env()
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def anyio_backend() -> str:
     return "asyncio"
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 async def db_connection() -> AsyncConnection:
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
@@ -29,6 +31,14 @@ async def db_connection() -> AsyncConnection:
     conn = await engine.connect()
     conn = await conn.execution_options(autocommit=False)
     return conn
+
+
+@pytest.fixture(scope="session")
+async def db_session() -> AsyncSession:
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+
+    return async_session()
 
 
 async def get_test_db_connection() -> AsyncConnection:
@@ -41,38 +51,15 @@ async def get_test_db_connection() -> AsyncConnection:
     return conn
 
 
-async def drop_db() -> None:
-    conn = await get_test_db_connection()
-    try:
-        await conn.execute(text("ROLLBACK"))
-        await conn.execute(text(f"DROP DATABASE fast_flat_test"))
-        print("SQL test database dropped")
-    except (DBAPIError, InvalidCatalogNameError):
-        await conn.execute(text("ROLLBACK"))
-
-
-async def create_db() -> None:
-    conn = await get_test_db_connection()
-    await conn.execute(text("ROLLBACK"))
-    try:
-        await conn.execute(text(f"CREATE DATABASE fast_flat_test"))
-    except (ProgrammingError, DuplicateDatabaseError):
-        await conn.execute(text("ROLLBACK"))
-    await conn.close()
-
-
-@pytest.fixture()
+@pytest.fixture(scope="session", autouse=True)
 async def apply_migrations() -> t.AsyncGenerator[t.Any, t.Any]:
     print("apply migrations")
-    await create_db()
-    config = Config("alembic.ini")
-    command.upgrade(config, "head")
+    Base.metadata.create_all(engine)
     yield
-    command.downgrade(config, "base")
-    await drop_db()
+    Base.metadata.drop_all(engine)
 
 
-@pytest.fixture
-async def client(apply_migrations: None) -> TestClient:
+@pytest.fixture(scope="session")
+async def client() -> TestClient:
     client = TestClient(app=app)
     return client

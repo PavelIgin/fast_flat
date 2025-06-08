@@ -1,7 +1,7 @@
 import uuid
 from typing import List
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
 from core.db import get_session
@@ -24,6 +24,7 @@ async def create_renting(
     item: RentingCreate,
     user: User = Depends(current_user),
     session: Session = Depends(get_session),
+    status_code=status.HTTP_201_CREATED,
 ):
     return await create_renting_service(item, user, session)
 

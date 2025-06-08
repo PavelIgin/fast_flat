@@ -1,1 +1,2 @@
-upper_date_more_then_lower = "upper date must be more then lower"
+__all__ = ("UPPER_DATE_MUST_BE_MORE_THEN_LOWER",)
+UPPER_DATE_MUST_BE_MORE_THEN_LOWER = "UPPER_DATE_MUST_BE_MORE_THEN_LOWER"

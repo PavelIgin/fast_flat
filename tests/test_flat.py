@@ -31,3 +31,43 @@ async def test_create_flat(client: TestClient, auth_user):
         headers={"Authorization": f"Bearer {auth_user}"},
     )
     assert response.status_code == 200
+
+
+@pytest.mark.anyio
+async def test_retrieve_flat(client: TestClient, auth_user, flat: int):
+    response = client.get(
+        url=f"/flat/{flat}",
+        headers={"Authorization": f"Bearer {auth_user}"},
+    )
+    assert response.status_code == 200
+
+
+@pytest.mark.anyio
+async def test_list_flat(client: TestClient, auth_user: dict, flat: int):
+    response = client.get(
+        url="/flat/",
+        headers={"Authorization": f"Bearer {auth_user}"},
+    )
+    assert response.status_code == 200
+
+
+@pytest.mark.anyio
+async def test_private_retrieve_flat(
+    client: TestClient, auth_user: dict, flat: int
+):
+    response = client.get(
+        url=f"/flat/private/{flat}",
+        headers={"Authorization": f"Bearer {auth_user}"},
+    )
+    assert response.status_code == 200
+
+
+@pytest.mark.anyio
+async def test_private_list_flat(
+    client: TestClient, auth_user: dict, flat: int
+):
+    response = client.get(
+        url=f"/flat/private/",
+        headers={"Authorization": f"Bearer {auth_user}"},
+    )
+    assert response.status_code == 200

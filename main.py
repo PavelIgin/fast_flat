@@ -1,11 +1,19 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from sqladmin import Admin
+from sqlalchemy import create_engine
+from sqlalchemy.orm import declarative_base
 
+from admin import PhotoAdmin, RentingAdmin
+from admin.flat import FlatAdmin
 from core.jwt import auth_backend
+from db import DATABASE_URL_SYNC
 from flat.endpoints import flat, photo, renting
 from users.models import fastapi_user
 from users.shemas import UserCreate, UserRead
 
+Base = declarative_base()
+engine = create_engine(DATABASE_URL_SYNC)
 app = FastAPI()
 
 current_user = fastapi_user.current_user()
@@ -36,3 +44,8 @@ app.include_router(
     prefix="/auth",
     tags=["auth"],
 )
+
+admin = Admin(app, engine)
+admin.add_view(FlatAdmin)
+# admin.add_view(RentingAdmin)
+admin.add_view(PhotoAdmin)

@@ -1,29 +1,27 @@
 import pytest
+from repositories import FlatRepository
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from flat.models import Flat
 from flat.schemas import FlatCreate
-from flat.service import flat_services
 from users.models import User
 
-__all__ = ("create_flat",)
+__all__ = ("flat",)
 
 
-@pytest.fixture(scope="session")
-def create_flat(
-    apply_migrations: None, created_user: User, db_connection: AsyncSession
-):
-    item = FlatCreate(
-        **{
-            "cost": 0,
-            "photos": ["string"],
-            "user": {
-                "email": "user@example.com",
-                "telegram_contact": "string",
-            },
-            "quadrature": 0,
-            "floor": 0,
-            "address": "string",
-            "is_active": True,
-        }
+@pytest.fixture()
+async def flat(user: User, db_session: AsyncSession):
+    data = dict(
+        cost=0,
+        # "photos": ["string"],
+        user_id=user["id"],
+        quadrature=0,
+        floor=0,
+        address="string",
+        is_active=True,
     )
-    flat_services.post_flat_service(item, created_user, db_connection)
+    item = Flat(**data)
+    repository = FlatRepository(session=db_session)
+    await repository.add(item)
+    return item.id
