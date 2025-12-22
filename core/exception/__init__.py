@@ -1,0 +1,1 @@
+from .common_exceprion import OnlyForOwnerException

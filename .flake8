@@ -1,0 +1,4 @@
+[flake8]
+exclude = .git, __pycache__, venv, __init__.py, tests/, env.py, alembic/
+max_line-length = 79
+ignore = E203, E266, E501, W503, C812, A003, B008
