@@ -17,7 +17,7 @@ from users.shemas import UserCreate, UserRead
 
 Base = declarative_base()
 engine = create_engine(DATABASE_URL_SYNC)
-app = FastAPI(openapi_url='api/')
+app = FastAPI()
 current_user = fastapi_user.current_user()
 
 app.include_router(flat.app, prefix="/api/v1/flat", tags=["flat"])
