@@ -17,12 +17,12 @@ from users.shemas import UserCreate, UserRead
 
 Base = declarative_base()
 engine = create_engine(DATABASE_URL_SYNC)
-app = FastAPI()
+app = FastAPI(openapi_url='api/')
 current_user = fastapi_user.current_user()
 
-app.include_router(flat.app, prefix="/flat", tags=["flat"])
-app.include_router(renting.app, prefix="/renting", tags=["renting"])
-app.include_router(photo.app, prefix="/photo", tags=["photo"])
+app.include_router(flat.app, prefix="/api/v1/flat", tags=["flat"])
+app.include_router(renting.app, prefix="/api/v1/renting", tags=["renting"])
+app.include_router(photo.app, prefix="/api/v1/photo", tags=["photo"])
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -32,18 +32,18 @@ app.add_middleware(
 )
 app.include_router(
     fastapi_user.get_auth_router(auth_backend),
-    prefix="/auth/jwt",
+    prefix="/api/v1/auth/jwt",
     tags=["auth"],
 )
 app.include_router(
     fastapi_user.get_register_router(UserRead, UserCreate),
-    prefix="/auth",
+    prefix="/api/v1/auth",
     tags=["auth"],
 )
 
 app.include_router(
     fastapi_user.get_reset_password_router(),
-    prefix="/auth",
+    prefix="/api/v1/auth",
     tags=["auth"],
 )
 
