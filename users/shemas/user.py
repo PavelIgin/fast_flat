@@ -17,8 +17,10 @@ class UserRead(schemas.BaseUser[uuid.UUID]):
     pass
 
 
-class UserCreate(schemas.BaseUserCreate):
+class UserCreate(schemas.CreateUpdateDictModel):
     telegram_contact: str = None
+    email: EmailStr
+    password: str
 
 
 class UserUpdate(schemas.BaseUserUpdate):

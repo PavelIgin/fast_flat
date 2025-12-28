@@ -62,7 +62,6 @@ async def post_flat_service(
     item: FlatCreate, user: User, session: AsyncSession
 ):
     item_dict = item.model_dump()
-    print(item_dict)
     item_dict["user_id"] = user.id
     photo_list = item_dict.pop("photos", None)
     flat_instance = Flat(**item_dict)
