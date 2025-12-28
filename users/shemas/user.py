@@ -1,8 +1,8 @@
 import uuid
 from typing import Optional
 
-from fastapi_users import schemas
-from pydantic import BaseModel, EmailStr
+from fastapi_users import schemas, models
+from pydantic import BaseModel, EmailStr, ConfigDict
 
 
 class UserForFlat(BaseModel):
@@ -13,8 +13,12 @@ class UserForFlat(BaseModel):
         from_attributes = True
 
 
-class UserRead(schemas.BaseUser[uuid.UUID]):
-    pass
+class UserRead(schemas.CreateUpdateDictModel):
+    id: models.ID
+    telegram_contact: str = None
+    email: EmailStr
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 class UserCreate(schemas.CreateUpdateDictModel):
@@ -22,6 +26,11 @@ class UserCreate(schemas.CreateUpdateDictModel):
     email: EmailStr
     password: str
 
+    model_config = ConfigDict(from_attributes=True)
 
-class UserUpdate(schemas.BaseUserUpdate):
+
+class UserUpdate(schemas.CreateUpdateDictModel):
     telegram_contact: str = None
+    email: EmailStr
+
+    model_config = ConfigDict(from_attributes=True)

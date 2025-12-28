@@ -13,7 +13,7 @@ from core.jwt import auth_backend
 from db import DATABASE_URL_SYNC
 from flat.endpoints import flat, photo, renting
 from users.models import fastapi_user
-from users.shemas import UserCreate, UserRead
+from users.shemas import UserCreate, UserRead, UserUpdate
 
 Base = declarative_base()
 engine = create_engine(DATABASE_URL_SYNC)
@@ -40,7 +40,11 @@ app.include_router(
     prefix="/api/v1/auth",
     tags=["auth"],
 )
-
+app.include_router(
+    fastapi_user.get_users_router(UserRead, UserUpdate),
+    prefix="/api/v1/auth",
+    tags=["auth"],
+)
 app.include_router(
     fastapi_user.get_reset_password_router(),
     prefix="/api/v1/auth",
