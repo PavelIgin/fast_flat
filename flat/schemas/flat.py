@@ -1,8 +1,11 @@
 import datetime
 from typing import List, Optional
+from uuid import UUID
 
+from pydantic import UUID4, AnyUrl, BaseModel, Field
+from fastapi_filter.contrib.sqlalchemy import Filter
 from flat.enums import PromotionEnum
-from pydantic import UUID4, AnyUrl, BaseModel
+from flat.models import Flat
 
 from users.shemas import UserForFlat
 
@@ -118,3 +121,19 @@ class FlatCreate(BaseModel):
 
 class FlatID(BaseModel):
     id: UUID4
+
+
+class FlatFilter(Filter):
+    __tablename__ = "flat"
+    cost__gte: Optional[int] = None
+    cost__lte: Optional[int] = None
+    floor__gte: Optional[int] = None
+    floor__lte: Optional[int] = None
+
+    order_by: Optional[list[str]] = None
+    class Constants(Filter.Constants):
+        model = Flat
+
+
+class FlatErrorMessage(BaseModel):
+    detail: str = 'FLAT_DOES_NOT_EXISTS_BY_USER'

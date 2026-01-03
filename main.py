@@ -1,7 +1,6 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.templating import Jinja2Templates
-from fastapi.staticfiles import StaticFiles
+from fastapi_pagination import add_pagination
 
 from sqladmin import Admin
 from sqlalchemy import create_engine
@@ -18,7 +17,7 @@ from users.shemas import UserCreate, UserRead, UserUpdate
 Base = declarative_base()
 engine = create_engine(DATABASE_URL_SYNC)
 app = FastAPI()
-current_user = fastapi_user.current_user()
+add_pagination(app)
 
 app.include_router(flat.app, prefix="/api/v1/flat", tags=["flat"])
 app.include_router(renting.app, prefix="/api/v1/renting", tags=["renting"])

@@ -1,3 +1,4 @@
+import typing
 import asyncio
 import json
 import os
@@ -12,8 +13,9 @@ from flat.models import Flat
 from flat.repositories import FlatRepository
 from flat.schemas import FlatCreate, FlatUpdate, FlatPrivateSchema
 from users.models import User
-
 from .photo import create_photo_and_s3_object
+if typing.TYPE_CHECKING:
+    from flat.schemas import FlatFilter
 
 env_file = os.path.join(".env")
 env = Env()
@@ -25,9 +27,9 @@ RABBITMQ_PASSWORD = env.str("RABBITMQ_PASSWORD", default="RABBITMQ_PASSWORD")
 # TODO ВЫЯСНИТЬ КУДА ОБЪЯВИТЬ ВСЕ ЭНВЫ
 
 
-async def list_flat_service(session: AsyncSession):
+async def list_flat_service(filter: 'FlatFilter', session: AsyncSession):
     repository = FlatRepository(session=session)
-    result = await repository.list_flat()
+    result = await repository.list_flat(filter)
     return result
 
 
@@ -37,13 +39,13 @@ async def list_private_service(session: AsyncSession, user):
     return result
 
 
-async def retrieve_private_service(pk: UUID, session: AsyncSession):
+async def retrieve_private_service(user, pk: UUID, session: AsyncSession):
     repository = FlatRepository(session=session)
-    result = await repository.retrieve_private(pk)
+    result = await repository.retrieve_private(user, pk)
     return result
 
 
-async def retrieve_flat_service(pk: UUID, session: AsyncSession):
+async def retrieve_flat_service(pk: UUID, session: AsyncSession, user: User):
     repository = FlatRepository(session=session)
     result = await repository.retrieve_flat(pk)
     return result

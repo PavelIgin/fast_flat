@@ -6,6 +6,7 @@ from .flat import (
     FlatSchema,
     FlatSchemaForRenting,
     FlatUpdate,
+    FlatFilter
 )
 from .photo import PhotoCreateSchema, PhotoSchema
 from .renting import RentingCreate, RentingSchema
